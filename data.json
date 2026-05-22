@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-05-22 22:06:45",
+  "last_updated": "2026-05-22 17:45:26",
   "summary": {
-    "total_files": 7,
-    "successful": 5,
-    "errors": 2,
-    "municipalities": 5,
-    "elapsed_seconds": 7.28,
-    "input_folder": "prueba"
+    "total_files": 2,
+    "successful": 2,
+    "errors": 0,
+    "municipalities": 1,
+    "elapsed_seconds": 2.55,
+    "input_folder": "PRUEBA_SHAPE_ORG"
   },
   "municipalities": [
     {
@@ -14,116 +14,31 @@
       "files": 2,
       "ok": 2,
       "errors": 0,
-      "records": 4,
+      "records": 333,
       "geometry_types": [
         "Polygon",
-        "LineString"
-      ]
-    },
-    {
-      "name": "Calarcá",
-      "files": 1,
-      "ok": 1,
-      "errors": 0,
-      "records": 2,
-      "geometry_types": [
-        "LineString"
-      ]
-    },
-    {
-      "name": "Montenegro",
-      "files": 1,
-      "ok": 1,
-      "errors": 0,
-      "records": 3,
-      "geometry_types": [
-        "Polygon"
-      ]
-    },
-    {
-      "name": "Quimbaya",
-      "files": 1,
-      "ok": 1,
-      "errors": 0,
-      "records": 3,
-      "geometry_types": [
-        "Point"
-      ]
-    },
-    {
-      "name": "Sin municipio",
-      "files": 2,
-      "ok": 0,
-      "errors": 2,
-      "records": 1,
-      "geometry_types": [
-        "Polygon"
+        "Polygon, MultiPolygon"
       ]
     }
   ],
   "shapefiles": [
     {
-      "filename": "Armenia_limite.shp",
+      "filename": "Deslizamiento.shp",
       "municipality": "Armenia",
-      "crs": "EPSG:4326",
+      "crs": "EPSG:3115",
+      "geometry": "Polygon, MultiPolygon",
+      "records": 332,
+      "status": "OK",
+      "method": "codigo_DANE"
+    },
+    {
+      "filename": "Perimetro_Urbano.shp",
+      "municipality": "Armenia",
+      "crs": "EPSG:3115",
       "geometry": "Polygon",
       "records": 1,
       "status": "OK",
-      "method": "nombre_archivo"
-    },
-    {
-      "filename": "Armenia_vias.shp",
-      "municipality": "Armenia",
-      "crs": "EPSG:4326",
-      "geometry": "LineString",
-      "records": 3,
-      "status": "OK",
-      "method": "nombre_archivo"
-    },
-    {
-      "filename": "predios_sin_municipio.shp",
-      "municipality": "Sin identificar",
-      "crs": "EPSG:4326",
-      "geometry": "Polygon",
-      "records": 1,
-      "status": "Sin municipio",
-      "method": "no_identificado"
-    },
-    {
-      "filename": "incompleto_test.shp",
-      "municipality": "Sin identificar",
-      "crs": "N/A",
-      "geometry": "N/A",
-      "records": 0,
-      "status": "Incompleto",
-      "method": "no_identificado"
-    },
-    {
-      "filename": "Calarcá_rios.shp",
-      "municipality": "Calarcá",
-      "crs": "EPSG:4326",
-      "geometry": "LineString",
-      "records": 2,
-      "status": "OK",
-      "method": "nombre_archivo"
-    },
-    {
-      "filename": "Montenegro_predios.shp",
-      "municipality": "Montenegro",
-      "crs": "EPSG:4326",
-      "geometry": "Polygon",
-      "records": 3,
-      "status": "OK",
-      "method": "nombre_archivo"
-    },
-    {
-      "filename": "Quimbaya_equipamentos.shp",
-      "municipality": "Quimbaya",
-      "crs": "EPSG:4326",
-      "geometry": "Point",
-      "records": 3,
-      "status": "OK",
-      "method": "nombre_archivo"
+      "method": "codigo_DANE"
     }
   ]
 }
