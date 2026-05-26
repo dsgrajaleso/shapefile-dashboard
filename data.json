@@ -1,40 +1,30 @@
 {
-  "last_updated": "2026-05-22 17:45:26",
+  "last_updated": "2026-05-25 19:24:57",
   "summary": {
-    "total_files": 2,
-    "successful": 2,
+    "total_files": 1,
+    "successful": 1,
     "errors": 0,
     "municipalities": 1,
-    "elapsed_seconds": 2.55,
+    "elapsed_seconds": 1.04,
     "input_folder": "PRUEBA_SHAPE_ORG"
   },
   "municipalities": [
     {
-      "name": "Armenia",
-      "files": 2,
-      "ok": 2,
+      "name": "Bogotá",
+      "files": 1,
+      "ok": 1,
       "errors": 0,
-      "records": 333,
+      "records": 1,
       "geometry_types": [
-        "Polygon",
-        "Polygon, MultiPolygon"
+        "Polygon"
       ]
     }
   ],
   "shapefiles": [
     {
-      "filename": "Deslizamiento.shp",
-      "municipality": "Armenia",
-      "crs": "EPSG:3115",
-      "geometry": "Polygon, MultiPolygon",
-      "records": 332,
-      "status": "OK",
-      "method": "codigo_DANE"
-    },
-    {
-      "filename": "Perimetro_Urbano.shp",
-      "municipality": "Armenia",
-      "crs": "EPSG:3115",
+      "filename": "Muni.shp",
+      "municipality": "Bogotá",
+      "crs": "EPSG:4686",
       "geometry": "Polygon",
       "records": 1,
       "status": "OK",
