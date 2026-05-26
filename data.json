@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-26 10:06:27",
+  "last_updated": "2026-05-26 10:07:35",
   "summary": {
     "total_files": 3,
     "successful": 3,
@@ -10,13 +10,13 @@
   "municipalities": [
     {
       "name": "Armenia",
-      "files": 18,
-      "ok": 18,
+      "files": 20,
+      "ok": 20,
       "errors": 0,
-      "records": 2997,
+      "records": 3330,
       "geometry_types": [
-        "Polygon",
-        "Polygon, MultiPolygon"
+        "Polygon, MultiPolygon",
+        "Polygon"
       ]
     },
     {
@@ -40,7 +40,7 @@
       "status": "OK",
       "method": "codigo_DANE",
       "processed_by": "Daniel Grajales",
-      "processed_at": "2026-05-26 10:06:27"
+      "processed_at": "2026-05-26 10:07:35"
     },
     {
       "filename": "Perimetro_Urbano.shp",
@@ -51,7 +51,7 @@
       "status": "OK",
       "method": "codigo_DANE",
       "processed_by": "Daniel Grajales",
-      "processed_at": "2026-05-26 10:06:27"
+      "processed_at": "2026-05-26 10:07:35"
     },
     {
       "filename": "Muni.shp",
@@ -66,6 +66,15 @@
     }
   ],
   "history": [
+    {
+      "date": "2026-05-26 10:07:35",
+      "user": "Daniel Grajales",
+      "total": 2,
+      "successful": 2,
+      "municipalities": 1,
+      "elapsed": 2.54,
+      "folder": "PRUEBA_SHAPE_ORG"
+    },
     {
       "date": "2026-05-26 10:06:27",
       "user": "Daniel Grajales",
