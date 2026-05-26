@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-05-25 19:35:10",
+  "last_updated": "2026-05-25 19:42:13",
   "summary": {
     "total_files": 2,
     "successful": 2,
     "errors": 0,
     "municipalities": 1,
-    "elapsed_seconds": 5.48,
+    "elapsed_seconds": 0.23,
     "input_folder": "PRUEBA_SHAPE_ORG"
   },
   "municipalities": [
