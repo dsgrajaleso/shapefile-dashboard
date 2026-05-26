@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-25 19:42:52",
+  "last_updated": "2026-05-25 19:42:54",
   "summary": {
     "total_files": 3,
     "successful": 3,
@@ -21,10 +21,10 @@
     },
     {
       "name": "Bogotá",
-      "files": 1,
-      "ok": 1,
+      "files": 3,
+      "ok": 3,
       "errors": 0,
-      "records": 1,
+      "records": 3,
       "geometry_types": [
         "Polygon"
       ]
@@ -58,10 +58,19 @@
       "status": "OK",
       "method": "codigo_DANE",
       "processed_by": "Usuario",
-      "processed_at": "2026-05-25 19:42:51"
+      "processed_at": "2026-05-25 19:42:53"
     }
   ],
   "history": [
+    {
+      "date": "2026-05-25 19:42:53",
+      "user": "Usuario",
+      "total": 1,
+      "successful": 1,
+      "municipalities": 1,
+      "elapsed": 1.16,
+      "folder": "PRUEBA_SHAPE_ORG"
+    },
     {
       "date": "2026-05-25 19:42:51",
       "user": "Usuario",
