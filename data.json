@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-05-27 08:07:39",
+  "last_updated": "2026-05-27 08:07:44",
   "summary": {
-    "total_files": 2,
-    "successful": 2,
+    "total_files": 3,
+    "successful": 3,
     "errors": 0,
-    "municipalities": 1,
-    "users": 1
+    "municipalities": 2,
+    "users": 2
   },
   "municipalities": [
     {
@@ -16,6 +16,16 @@
       "records": 333,
       "geometry_types": [
         "Polygon, MultiPolygon",
+        "Polygon"
+      ]
+    },
+    {
+      "name": "Bogotá",
+      "files": 1,
+      "ok": 1,
+      "errors": 0,
+      "records": 1,
+      "geometry_types": [
         "Polygon"
       ]
     }
@@ -42,9 +52,29 @@
       "method": "codigo_DANE",
       "processed_by": "Daniel Grajales",
       "processed_at": "2026-05-27 08:07:38"
+    },
+    {
+      "filename": "Muni.shp",
+      "municipality": "Bogotá",
+      "crs": "EPSG:4686",
+      "geometry": "Polygon",
+      "records": 1,
+      "status": "OK",
+      "method": "codigo_DANE",
+      "processed_by": "Usuario",
+      "processed_at": "2026-05-27 08:07:43"
     }
   ],
   "history": [
+    {
+      "date": "2026-05-27 08:07:43",
+      "user": "Usuario",
+      "total": 1,
+      "successful": 1,
+      "municipalities": 1,
+      "elapsed": 7.29,
+      "folder": "PRUEBA_SHAPE_ORG"
+    },
     {
       "date": "2026-05-27 08:07:38",
       "user": "Daniel Grajales",
