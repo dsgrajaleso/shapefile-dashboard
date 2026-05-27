@@ -1,70 +1,14 @@
 {
-  "last_updated": "2026-05-26 19:55:04",
+  "last_updated": "2026-05-26 20:14:43",
   "summary": {
-    "total_files": 3,
-    "successful": 3,
+    "total_files": 0,
+    "successful": 0,
     "errors": 0,
-    "municipalities": 2,
-    "users": 2
+    "municipalities": 0,
+    "users": 0
   },
-  "municipalities": [
-    {
-      "name": "Armenia",
-      "files": 28,
-      "ok": 28,
-      "errors": 0,
-      "records": 4662,
-      "geometry_types": [
-        "Polygon",
-        "Polygon, MultiPolygon"
-      ]
-    },
-    {
-      "name": "Bogotá",
-      "files": 12,
-      "ok": 12,
-      "errors": 0,
-      "records": 12,
-      "geometry_types": [
-        "Polygon"
-      ]
-    }
-  ],
-  "shapefiles": [
-    {
-      "filename": "Deslizamiento.shp",
-      "municipality": "Armenia",
-      "crs": "EPSG:3115",
-      "geometry": "Polygon, MultiPolygon",
-      "records": 332,
-      "status": "OK",
-      "method": "codigo_DANE",
-      "processed_by": "Daniel Grajales",
-      "processed_at": "2026-05-26 19:55:03"
-    },
-    {
-      "filename": "Perimetro_Urbano.shp",
-      "municipality": "Armenia",
-      "crs": "EPSG:3115",
-      "geometry": "Polygon",
-      "records": 1,
-      "status": "OK",
-      "method": "codigo_DANE",
-      "processed_by": "Daniel Grajales",
-      "processed_at": "2026-05-26 19:55:03"
-    },
-    {
-      "filename": "Muni.shp",
-      "municipality": "Bogotá",
-      "crs": "EPSG:4686",
-      "geometry": "Polygon",
-      "records": 1,
-      "status": "OK",
-      "method": "codigo_DANE",
-      "processed_by": "Usuario",
-      "processed_at": "2026-05-26 19:27:13"
-    }
-  ],
+  "municipalities": [],
+  "shapefiles": [],
   "history": [
     {
       "date": "2026-05-26 19:55:03",
