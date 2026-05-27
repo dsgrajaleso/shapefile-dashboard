@@ -1,24 +1,13 @@
 {
-  "last_updated": "2026-05-26 20:26:29",
+  "last_updated": "2026-05-26 20:26:33",
   "summary": {
     "total_files": 0,
     "successful": 0,
     "errors": 0,
-    "municipalities": 1,
+    "municipalities": 0,
     "users": 0
   },
-  "municipalities": [
-    {
-      "name": "Bogotá",
-      "files": 2,
-      "ok": 2,
-      "errors": 0,
-      "records": 2,
-      "geometry_types": [
-        "Polygon"
-      ]
-    }
-  ],
+  "municipalities": [],
   "shapefiles": [],
   "history": [
     {
