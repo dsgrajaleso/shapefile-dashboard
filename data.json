@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-26 20:35:25",
+  "last_updated": "2026-05-26 20:35:31",
   "summary": {
     "total_files": 0,
     "successful": 0,
@@ -9,15 +9,5 @@
   },
   "municipalities": [],
   "shapefiles": [],
-  "history": [
-    {
-      "date": "2026-05-26 20:33:33",
-      "user": "Daniel Grajales",
-      "total": 2,
-      "successful": 2,
-      "municipalities": 1,
-      "elapsed": 1.7,
-      "folder": "PRUEBA_SHAPE_ORG"
-    }
-  ]
+  "history": []
 }
