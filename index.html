@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShapefileOrganizer — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e2e8f0;min-height:100vh}
+header{background:#1a2942;border-bottom:1px solid #2d4a6b;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#2563eb,#0ea5e9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo h1{font-size:18px;font-weight:600;color:#f1f5f9}
+.logo span{font-size:12px;color:#64748b;display:block;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.last-update{font-size:12px;color:#64748b}
+.btn{border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;font-weight:500}
+.btn-primary{background:#2563eb;color:#fff}.btn-primary:hover{background:#1d4ed8}
+.btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-ghost{background:#1e3352;color:#94a3b8;border:1px solid #2d4a6b}.btn-ghost:hover{background:#2d4a6b;color:#e2e8f0}
+.btn-success{background:#16a34a;color:#fff}.btn-success:hover{background:#15803d}
+.btn-sm{padding:5px 10px;font-size:12px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tabs-nav{display:flex;gap:4px;padding:0 32px;background:#1a2942;border-bottom:1px solid #2d4a6b}
+.tab-nav{padding:12px 18px;font-size:13px;cursor:pointer;color:#64748b;border-bottom:2px solid transparent;transition:all .2s;background:none;border-left:none;border-right:none;border-top:none}
+.tab-nav:hover{color:#e2e8f0}
+.tab-nav.active{color:#60a5fa;border-bottom-color:#2563eb}
+.tab-content{display:none;padding:24px 32px;max-width:1400px;margin:0 auto}
+.tab-content.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.metric{background:#1a2942;border:1px solid #2d4a6b;border-radius:12px;padding:20px;text-align:center}
+.metric-value{font-size:30px;font-weight:700;margin-bottom:4px}
+.metric-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.metric.blue .metric-value{color:#60a5fa}
+.metric.green .metric-value{color:#4ade80}
+.metric.red .metric-value{color:#f87171}
+.metric.amber .metric-value{color:#fbbf24}
+.metric.purple .metric-value{color:#c084fc}
+.metric.cyan .metric-value{color:#22d3ee}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+.card{background:#1a2942;border:1px solid #2d4a6b;border-radius:12px;padding:20px;margin-bottom:20px}
+.card-title{font-size:13px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;color:#64748b;font-weight:500;border-bottom:1px solid #2d4a6b;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:8px 12px;border-bottom:1px solid #1e3352;vertical-align:middle}
+tr:hover td{background:#1e3352}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.badge.ok{background:#052e16;color:#4ade80;border:1px solid #166534}
+.badge.error{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d}
+.badge.warn{background:#2d1f00;color:#fbbf24;border:1px solid #78350f}
+.badge.info{background:#0c1a2e;color:#60a5fa;border:1px solid #1e3a5f}
+.badge.user{background:#1a0c2e;color:#c084fc;border:1px solid #6b21a8}
+.method-badge{font-size:10px;padding:2px 6px;border-radius:4px;background:#0f2544;color:#60a5fa}
+#map-container{width:100%;height:380px;background:#0d1f33;border-radius:8px;overflow:hidden;position:relative}
+.map-tooltip{position:absolute;background:#1e3352;border:1px solid #2d4a6b;border-radius:6px;padding:8px 12px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .2s;z-index:10}
+.map-tooltip strong{color:#60a5fa;display:block;margin-bottom:2px}
+.progress-bar{background:#0d1f33;border-radius:4px;height:6px}
+.progress-fill{height:6px;border-radius:4px;background:linear-gradient(90deg,#2563eb,#0ea5e9);transition:width .5s}
+.search-box{width:100%;padding:8px 12px;background:#0d1f33;border:1px solid #2d4a6b;border-radius:6px;color:#e2e8f0;font-size:13px;margin-bottom:12px}
+.search-box:focus{outline:none;border-color:#2563eb}
+.cb{width:15px;height:15px;cursor:pointer;accent-color:#2563eb}
+.loading{text-align:center;padding:60px;color:#64748b}
+.loading-spinner{width:32px;height:32px;border:3px solid #1e3352;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#1a2942;border:1px solid #2d4a6b;border-radius:12px;padding:28px;max-width:420px;width:90%;text-align:center}
+.modal h3{font-size:16px;margin-bottom:8px;color:#f1f5f9}
+.modal p{font-size:13px;color:#94a3b8;margin-bottom:20px;line-height:1.5}
+.modal-btns{display:flex;gap:10px;justify-content:center}
+.admin-section{background:#1a2942;border:1px solid #2d4a6b;border-radius:12px;padding:20px;margin-bottom:16px}
+.admin-section h3{font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:6px}
+.admin-section p{font-size:12px;color:#64748b;margin-bottom:14px}
+.danger-zone{border-color:#7f1d1d}
+.danger-zone h3{color:#f87171}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1e3352}
+.history-item:last-child{border-bottom:none}
+.history-info{font-size:13px}
+.history-info strong{color:#e2e8f0;display:block}
+.history-info span{color:#64748b;font-size:11px}
+.select-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.select-bar span{font-size:12px;color:#64748b}
+.lock-overlay{background:#0d1f33;border:1px solid #2d4a6b;border-radius:12px;padding:40px;text-align:center;margin-bottom:16px}
+.lock-overlay h3{font-size:16px;color:#94a3b8;margin-bottom:8px}
+.lock-overlay p{font-size:13px;color:#475569;margin-bottom:20px}
+.pin-input{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.pin-input input{width:44px;height:44px;text-align:center;font-size:20px;font-weight:700;background:#1a2942;border:1px solid #2d4a6b;border-radius:8px;color:#e2e8f0;outline:none}
+.pin-input input:focus{border-color:#2563eb}
+.admin-badge{display:inline-flex;align-items:center;gap:6px;background:#052e16;color:#4ade80;border:1px solid #166534;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+footer{text-align:center;padding:20px;color:#334155;font-size:12px;border-top:1px solid #1e3352;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🗺️</div>
+    <div>
+      <h1>ShapefileOrganizer</h1>
+      <span>Dashboard de organización geoespacial — IDE Risaralda</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="admin-status"></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="status-dot"></div>
+      <span class="last-update" id="last-update">Cargando...</span>
+    </div>
+    <button class="btn btn-ghost" onclick="loadData()">↻ Actualizar</button>
+  </div>
+</header>
+
+<div class="tabs-nav">
+  <button class="tab-nav active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+  <button class="tab-nav" onclick="switchTab('municipios',this)">🏙️ Municipios</button>
+  <button class="tab-nav" onclick="switchTab('archivos',this)">📁 Archivos</button>
+  <button class="tab-nav" onclick="switchTab('historial',this)">📋 Historial</button>
+  <button class="tab-nav" onclick="switchTab('admin',this)">⚙️ Administrar</button>
+</div>
+
+<!-- TAB DASHBOARD -->
+<div id="tab-dashboard" class="tab-content active">
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <div>Cargando datos...</div>
+  </div>
+  <div id="dash-content" style="display:none">
+    <div class="metrics" id="metrics"></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📍 Mapa de municipios</div>
+        <div id="map-container"><div class="map-tooltip" id="tooltip"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Shapefiles por municipio</div>
+        <div style="position:relative;height:350px"><canvas id="chart-mun"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📐 Tipos de geometría</div>
+        <div style="position:relative;height:220px"><canvas id="chart-geom"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">✅ Estado del procesamiento</div>
+        <div style="position:relative;height:220px"><canvas id="chart-status"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB MUNICIPIOS -->
+<div id="tab-municipios" class="tab-content">
+  <div class="card">
+    <div class="card-title"><span>🏙️ Resumen por municipio</span></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>Municipio</th><th>Archivos</th><th>OK</th><th>Errores</th><th>Registros</th><th>Geometrías</th><th>Progreso</th>
+        </tr></thead>
+        <tbody id="tbody-mun"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB ARCHIVOS -->
+<div id="tab-archivos" class="tab-content">
+  <div class="card">
+    <div class="card-title"><span>📁 Detalle de archivos</span></div>
+    <input type="text" class="search-box" id="search" placeholder="Buscar por nombre, municipio, usuario o estado..." oninput="filterTable()">
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>Archivo</th><th>Municipio</th><th>CRS</th><th>Geometría</th><th>Registros</th><th>Procesado por</th><th>Fecha</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="tbody-files"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB HISTORIAL -->
+<div id="tab-historial" class="tab-content">
+  <div class="card">
+    <div class="card-title">📋 Historial de procesamientos</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- TAB ADMIN -->
+<div id="tab-admin" class="tab-content">
+
+  <!-- LOCK: pedir PIN si no está autenticado -->
+  <div id="admin-lock" class="lock-overlay">
+    <div style="font-size:40px;margin-bottom:12px">🔐</div>
+    <h3>Área de Administración</h3>
+    <p>Ingresa tu PIN y el token de GitHub para continuar.<br>Los cambios se aplicarán automáticamente.</p>
+    <div style="margin-bottom:16px">
+      <p style="font-size:11px;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">PIN de 4 dígitos</p>
+      <div class="pin-input">
+        <input type="password" maxlength="1" id="p1" oninput="nextPin(this,'p2')" onkeydown="handlePin(event,this,null,'p2')">
+        <input type="password" maxlength="1" id="p2" oninput="nextPin(this,'p3')" onkeydown="handlePin(event,this,'p1','p3')">
+        <input type="password" maxlength="1" id="p3" oninput="nextPin(this,'p4')" onkeydown="handlePin(event,this,'p2','p4')">
+        <input type="password" maxlength="1" id="p4" oninput="nextPin(this,'token-input')" onkeydown="handlePin(event,this,'p3',null)">
+      </div>
+    </div>
+    <div style="margin-bottom:20px;text-align:left">
+      <p style="font-size:11px;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">GitHub Token</p>
+      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        style="width:100%;padding:10px 12px;background:#0d1f33;border:1px solid #2d4a6b;border-radius:6px;color:#e2e8f0;font-size:13px;font-family:monospace"
+        onkeydown="if(event.key==='Enter') checkPin()">
+      <p style="font-size:11px;color:#475569;margin-top:4px">El token no se guarda. Se usa solo para esta sesión.</p>
+    </div>
+    <button class="btn btn-primary" onclick="checkPin()" style="margin:0 auto">🔓 Ingresar como administrador</button>
+    <p id="pin-error" style="color:#f87171;font-size:12px;margin-top:10px;display:none">PIN incorrecto o token inválido.</p>
+  </div>
+
+  <!-- PANEL ADMIN: visible solo con PIN correcto -->
+  <div id="admin-panel" style="display:none">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <span class="admin-badge">✓ Administrador autenticado</span>
+      <button class="btn btn-ghost btn-sm" onclick="lockAdmin()">🔒 Cerrar sesión admin</button>
+    </div>
+
+    <div class="admin-section">
+      <h3>🔍 Eliminar por municipio</h3>
+      <p>Selecciona municipios y elimina todos sus registros del dashboard.</p>
+      <div id="mun-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+      <button class="btn btn-danger" onclick="confirmDeleteMunicipalities()">🗑 Eliminar municipios seleccionados</button>
+    </div>
+
+    <div class="admin-section">
+      <h3>📁 Eliminar archivos individuales</h3>
+      <p>Selecciona archivos específicos para eliminar del dashboard.</p>
+      <input type="text" class="search-box" id="search-admin" placeholder="Buscar archivo..." oninput="filterAdminFiles()" style="margin-bottom:10px">
+      <div style="max-height:300px;overflow-y:auto" id="files-checkboxes"></div>
+      <button class="btn btn-danger" style="margin-top:12px" onclick="confirmDeleteFiles()">🗑 Eliminar archivos seleccionados</button>
+    </div>
+
+    <div class="admin-section danger-zone">
+      <h3>⚠️ Zona de peligro</h3>
+      <p>Estas acciones eliminan datos permanentemente. Los archivos en los PCs no se borran.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-danger" onclick="confirmAction('clearAll')">🗑 Limpiar todo el dashboard</button>
+        <button class="btn btn-ghost" onclick="confirmAction('resetHistory')">↺ Reiniciar historial</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">¿Confirmar?</h3>
+    <p id="modal-msg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" onclick="executeAction()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<footer>ShapefileOrganizer v1.0 — dsgrajaleso — IDE Risaralda</footer>
+
+<script>
+let globalData = null;
+let pendingAction = null;
+let pendingTarget = null;
+let chartMun=null,chartGeom=null,chartStatus=null;
+let isAdmin = false;
+let adminToken = "";
+
+// ── PIN DE ADMINISTRADOR ─────────────────────────────────────────────────────
+// Cambia este número por tu PIN personal (4 dígitos)
+const ADMIN_PIN = "2608";
+
+function nextPin(el, nextId) {
+  if (el.value && nextId) document.getElementById(nextId).focus();
+  if (!nextId) checkPin();
+}
+function handlePin(e, el, prevId, nextId) {
+  if (e.key === 'Backspace' && !el.value && prevId) document.getElementById(prevId).focus();
+}
+function checkPin() {
+  const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
+  const token = document.getElementById('token-input').value.trim();
+  if (pin === ADMIN_PIN && token.startsWith('ghp_')) {
+    isAdmin = true;
+    adminToken = token;
+    document.getElementById('admin-lock').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    document.getElementById('admin-status').innerHTML = '<span class="admin-badge">🔓 Admin</span>';
+    renderAdminPanel();
+  } else {
+    document.getElementById('pin-error').style.display = 'block';
+    ['p1','p2','p3','p4'].forEach(id => { document.getElementById(id).value = ''; });
+    if (!token.startsWith('ghp_')) {
+      document.getElementById('token-input').style.borderColor = '#dc2626';
+      setTimeout(() => { document.getElementById('token-input').style.borderColor = '#2d4a6b'; }, 2000);
+    }
+    document.getElementById('p1').focus();
+  }
+}
+function lockAdmin() {
+  isAdmin = false;
+  adminToken = "";
+  ['p1','p2','p3','p4'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('token-input').value = '';
+  document.getElementById('admin-lock').style.display = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-status').innerHTML = '';
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-nav').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── CARGA DE DATOS ───────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('data.json?t=' + Date.now(), {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
+    });
+    if (!res.ok) throw new Error('No data.json');
+    globalData = await res.json();
+    render();
+  } catch(e) {
+    document.getElementById('loading').innerHTML =
+      '<div style="color:#f87171;padding:40px;text-align:center">⚠️ No se encontró <strong>data.json</strong><br><br><span style="color:#64748b;font-size:12px">Procesa shapefiles desde la aplicación.</span></div>';
+  }
+}
+
+function render() {
+  if (!globalData) return;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('dash-content').style.display = 'block';
+  document.getElementById('last-update').textContent = 'Actualizado: ' + globalData.last_updated;
+  renderMetrics(globalData.summary);
+  renderMunicipalityTable(globalData.municipalities);
+  renderFilesTable(globalData.shapefiles);
+  renderHistorial(globalData.history || []);
+  renderCharts(globalData);
+  renderMap(globalData.municipalities);
+  if (isAdmin) renderAdminPanel();
+}
+
+// ── MÉTRICAS ─────────────────────────────────────────────────────────────────
+function renderMetrics(s) {
+  const pct = s.total_files > 0 ? Math.round(s.successful/s.total_files*100) : 0;
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric blue"><div class="metric-value">${s.total_files}</div><div class="metric-label">Total shapefiles</div></div>
+    <div class="metric green"><div class="metric-value">${s.successful}</div><div class="metric-label">Procesados OK</div></div>
+    <div class="metric red"><div class="metric-value">${s.errors}</div><div class="metric-label">Con errores</div></div>
+    <div class="metric amber"><div class="metric-value">${s.municipalities}</div><div class="metric-label">Municipios</div></div>
+    <div class="metric cyan"><div class="metric-value">${s.users||1}</div><div class="metric-label">Usuarios</div></div>
+    <div class="metric purple"><div class="metric-value">${pct}%</div><div class="metric-label">Tasa de éxito</div></div>`;
+}
+
+// ── TABLAS ───────────────────────────────────────────────────────────────────
+function renderMunicipalityTable(muns) {
+  document.getElementById('tbody-mun').innerHTML = muns.map(m => {
+    const pct = m.files > 0 ? Math.round(m.ok/m.files*100) : 0;
+    return `<tr>
+      <td style="font-weight:600;color:#e2e8f0">${m.name}</td>
+      <td>${m.files}</td><td style="color:#4ade80">${m.ok}</td>
+      <td style="color:${m.errors>0?'#f87171':'#64748b'}">${m.errors}</td>
+      <td>${(m.records||0).toLocaleString()}</td>
+      <td>${(m.geometry_types||[]).map(g=>`<span class="badge info">${g}</span>`).join(' ')||'N/A'}</td>
+      <td style="min-width:100px"><div style="display:flex;align-items:center;gap:6px">
+        <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:11px;color:#64748b">${pct}%</span>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderFilesTable(files) {
+  document.getElementById('tbody-files').innerHTML = files.map(f => {
+    const sc = f.status==='OK'?'ok':(f.status.includes('municipio')?'warn':'error');
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px;color:#93c5fd">${f.filename}</td>
+      <td style="font-weight:500">${f.municipality}</td>
+      <td style="font-size:11px;color:#64748b">${f.crs}</td>
+      <td><span class="badge info">${f.geometry}</span></td>
+      <td>${(f.records||0).toLocaleString()}</td>
+      <td><span class="badge user">👤 ${f.processed_by||'desconocido'}</span></td>
+      <td style="font-size:11px;color:#64748b">${f.processed_at||''}</td>
+      <td><span class="badge ${sc}">${f.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('#tbody-files tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function renderHistorial(history) {
+  const el = document.getElementById('history-list');
+  if (!history.length) {
+    el.innerHTML = '<p style="color:#475569;font-size:13px;padding:20px">Sin historial registrado.</p>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div class="history-info">
+        <strong>${h.date} — <span class="badge user" style="font-size:11px">👤 ${h.user}</span></strong>
+        <span>${h.total} archivos · ${h.municipalities} municipios · ${h.successful} OK · ${h.elapsed}s · Carpeta: ${h.folder}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── PANEL ADMIN ──────────────────────────────────────────────────────────────
+function renderAdminPanel() {
+  if (!globalData) return;
+
+  // Checkboxes municipios
+  document.getElementById('mun-checkboxes').innerHTML = globalData.municipalities.map(m => `
+    <label style="display:flex;align-items:center;gap:6px;background:#0d1f33;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px">
+      <input type="checkbox" class="cb cb-admin-mun" value="${m.name}">
+      ${m.name} <span style="color:#64748b">(${m.files})</span>
+    </label>`).join('');
+
+  // Checkboxes archivos
+  document.getElementById('files-checkboxes').innerHTML = globalData.shapefiles.map(f => `
+    <label style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1e3352;cursor:pointer;font-size:12px" class="file-admin-item">
+      <input type="checkbox" class="cb cb-admin-file" value="${f.filename}|${f.municipality}">
+      <span style="color:#93c5fd;font-family:monospace">${f.filename}</span>
+      <span style="color:#64748b">${f.municipality}</span>
+      <span class="badge user" style="margin-left:auto">👤 ${f.processed_by||'?'}</span>
+    </label>`).join('');
+}
+
+function filterAdminFiles() {
+  const q = document.getElementById('search-admin').value.toLowerCase();
+  document.querySelectorAll('.file-admin-item').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function confirmDeleteMunicipalities() {
+  const sel = [...document.querySelectorAll('.cb-admin-mun:checked')].map(c=>c.value);
+  if (!sel.length) { alert('Selecciona al menos un municipio.'); return; }
+  pendingAction = 'deleteMunicipalities';
+  pendingTarget = sel;
+  showModal('¿Eliminar municipios?',
+    `Se eliminarán ${sel.length} municipio(s) y todos sus archivos del dashboard.\nMunicipios: ${sel.join(', ')}`);
+}
+
+function confirmDeleteFiles() {
+  const sel = [...document.querySelectorAll('.cb-admin-file:checked')].map(c=>c.value);
+  if (!sel.length) { alert('Selecciona al menos un archivo.'); return; }
+  pendingAction = 'deleteFiles';
+  pendingTarget = sel;
+  showModal('¿Eliminar archivos?', `Se eliminarán ${sel.length} archivo(s) del dashboard.`);
+}
+
+function confirmAction(action) {
+  pendingAction = action;
+  const msgs = {
+    clearAll:{ t:'¿Limpiar todo?', m:'Se eliminarán TODOS los registros del dashboard.' },
+    resetHistory:{ t:'¿Reiniciar historial?', m:'Se borrará todo el historial de procesamientos.' }
+  };
+  showModal(msgs[action].t, msgs[action].m);
+}
+
+function showModal(title, msg) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').textContent = msg;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  pendingAction = null; pendingTarget = null;
+}
+
+function executeAction() {
+  if (!isAdmin) { closeModal(); return; }
+  if (!globalData) { closeModal(); return; }
+
+  if (pendingAction === 'deleteMunicipalities') {
+    const muns = pendingTarget;
+    globalData.shapefiles = globalData.shapefiles.filter(f => !muns.includes(f.municipality));
+    globalData.municipalities = globalData.municipalities.filter(m => !muns.includes(m.name));
+  } else if (pendingAction === 'deleteFiles') {
+    const keys = pendingTarget; // "filename|municipality"
+    globalData.shapefiles = globalData.shapefiles.filter(f => {
+      return !keys.includes(`${f.filename}|${f.municipality}`);
+    });
+  } else if (pendingAction === 'clearAll') {
+    globalData.shapefiles = [];
+    globalData.municipalities = [];
+    globalData.history = [];
+  } else if (pendingAction === 'resetHistory') {
+    globalData.history = [];
+  }
+
+  // Recalcular summary
+  const total = globalData.shapefiles.length;
+  globalData.summary.total_files = total;
+  globalData.summary.successful = globalData.shapefiles.filter(f=>f.status==='OK').length;
+  globalData.summary.errors = total - globalData.summary.successful;
+  globalData.summary.municipalities = globalData.municipalities.length;
+  globalData.summary.users = new Set(globalData.shapefiles.map(f=>f.processed_by||'?')).size;
+  globalData.last_updated = new Date().toLocaleString('sv').replace('T',' ');
+
+  closeModal();
+  render();
+  // Subir cambios a GitHub automáticamente
+  uploadToGitHub(globalData);
+}
+
+// ── GRÁFICAS ─────────────────────────────────────────────────────────────────
+function renderCharts(data) {
+  if (chartMun) chartMun.destroy();
+  if (chartGeom) chartGeom.destroy();
+  if (chartStatus) chartStatus.destroy();
+  const top = data.municipalities.slice(0,12);
+  chartMun = new Chart(document.getElementById('chart-mun'), {
+    type:'bar',
+    data:{ labels:top.map(m=>m.name),
+      datasets:[
+        {label:'OK', data:top.map(m=>m.ok), backgroundColor:'#16a34a', borderRadius:4},
+        {label:'Error', data:top.map(m=>m.errors), backgroundColor:'#dc2626', borderRadius:4}
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{ x:{stacked:true,ticks:{color:'#64748b'},grid:{color:'#1e3352'}},
+               y:{stacked:true,ticks:{color:'#e2e8f0',font:{size:11}},grid:{color:'#1e3352'}}}}
+  });
+  const gc={};
+  data.shapefiles.forEach(f=>{ gc[f.geometry]=(gc[f.geometry]||0)+1; });
+  chartGeom = new Chart(document.getElementById('chart-geom'), {
+    type:'doughnut',
+    data:{ labels:Object.keys(gc),
+      datasets:[{data:Object.values(gc), backgroundColor:['#60a5fa','#4ade80','#fbbf24','#f87171','#c084fc'], borderWidth:0}]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},padding:10}}}}
+  });
+  chartStatus = new Chart(document.getElementById('chart-status'), {
+    type:'doughnut',
+    data:{ labels:['OK','Errores'],
+      datasets:[{data:[data.summary.successful,data.summary.errors], backgroundColor:['#16a34a','#dc2626'], borderWidth:0}]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},padding:10}}}}
+  });
+}
+
+// ── MAPA ─────────────────────────────────────────────────────────────────────
+function renderMap(muns) {
+  const container = document.getElementById('map-container');
+  const tooltip = document.getElementById('tooltip');
+  const w=container.clientWidth||600, h=container.clientHeight||380;
+  d3.select('#map-container svg').remove();
+  const svg = d3.select('#map-container').append('svg').attr('width',w).attr('height',h);
+  const maxFiles = Math.max(...muns.map(m=>m.files),1);
+  const munCoords = {
+    'Armenia':[-75.6811,4.5339],'Montenegro':[-75.8628,4.5696],'Calarcá':[-75.6422,4.4530],
+    'Circasia':[-75.6414,4.6161],'Filandia':[-75.6608,4.6733],'Quimbaya':[-75.7547,4.6247],
+    'Salento':[-75.5694,4.6371],'La Tebaida':[-75.7969,4.4542],'Pijao':[-75.6975,4.3142],
+    'Génova':[-75.7636,4.0303],'Buenavista':[-75.7697,4.2956],'Córdoba':[-75.6725,4.3986],
+    'Pereira':[-75.6961,4.8087],'Manizales':[-75.5172,5.0689],'Bogotá':[-74.0721,4.7110],
+    'Medellín':[-75.5636,6.2442],'Cali':[-76.5320,3.4516],'Ibagué':[-75.2328,4.4389],
+    'Villavicencio':[-73.6366,4.1420],'Bucaramanga':[-73.1198,7.1193],
+    'Barranquilla':[-74.7964,10.9685],'Cartagena':[-75.5144,10.3997],
+    'Neiva':[-75.2819,2.9273],'Popayán':[-76.6237,2.4448],'Montería':[-75.8830,8.7575],
+    'Pasto':[-77.2811,1.2136],'Florencia':[-75.6161,1.6144],'Cúcuta':[-72.5078,7.8939],
+  };
+  d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world => {
+    const col = topojson.feature(world, world.objects.countries);
+    const colombia = col.features.filter(f=>f.id==170);
+    const proj = d3.geoMercator().fitSize([w,h],{type:'FeatureCollection',features:colombia});
+    const path = d3.geoPath(proj);
+    svg.selectAll('.c').data(col.features).join('path').attr('class','c').attr('d',path)
+      .attr('fill',d=>d.id==170?'#1e3a5f':'#0d1f33').attr('stroke','#2d4a6b').attr('stroke-width',0.5);
+    muns.forEach(m => {
+      const coords=munCoords[m.name]; if(!coords) return;
+      const [x,y]=proj(coords); if(!x||!y) return;
+      const r=Math.max(6,Math.min(18,6+(m.files/maxFiles)*12));
+      const fill=m.ok===m.files?'#22c55e':(m.errors>0?'#f59e0b':'#60a5fa');
+      svg.append('circle').attr('cx',x).attr('cy',y).attr('r',r)
+        .attr('fill',fill).attr('fill-opacity',.85).attr('stroke','#fff').attr('stroke-width',1.5)
+        .style('cursor','pointer')
+        .on('mousemove',ev=>{
+          tooltip.style.opacity='1';
+          tooltip.style.left=(ev.offsetX+12)+'px'; tooltip.style.top=(ev.offsetY-10)+'px';
+          tooltip.innerHTML=`<strong>${m.name}</strong>${m.files} archivos · ${m.ok} OK · ${m.errors} errores`;
+        }).on('mouseleave',()=>{ tooltip.style.opacity='0'; });
+      svg.append('text').attr('x',x).attr('y',y+r+11).attr('text-anchor','middle')
+        .attr('font-size','9px').attr('fill','#94a3b8')
+        .text(m.name.length>10?m.name.substring(0,10)+'…':m.name);
+    });
+  }).catch(()=>{});
+}
+
+
+// ── SUBIR A GITHUB ────────────────────────────────────────────────────────────
+async function uploadToGitHub(data) {
+  if (!adminToken) { showNotification('⚠️ No hay token disponible', '#f59e0b'); return; }
+  showNotification('⏳ Guardando cambios en GitHub...', '#2563eb');
+  try {
+    const apiUrl = 'https://api.github.com/repos/dsgrajaleso/shapefile-dashboard/contents/data.json';
+    const headers = {
+      'Authorization': 'token ' + adminToken,
+      'Content-Type': 'application/json',
+      'User-Agent': 'ShapefileOrganizer-Dashboard/1.0'
+    };
+
+    // Obtener SHA actual
+    let sha = null;
+    try {
+      const getRes = await fetch(apiUrl, { headers });
+      if (getRes.ok) {
+        const existing = await getRes.json();
+        sha = existing.sha;
+      }
+    } catch(e) {}
+
+    // Preparar contenido
+    const jsonStr = JSON.stringify(data, null, 2);
+    const b64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    const payload = {
+      message: 'Admin: eliminación de datos - ' + new Date().toLocaleString('sv').replace('T',' '),
+      content: b64,
+      branch: 'main'
+    };
+    if (sha) payload.sha = sha;
+
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    if (putRes.ok) {
+      showNotification('✅ Cambios guardados en GitHub correctamente', '#16a34a');
+    } else {
+      const err = await putRes.json();
+      showNotification('⚠️ Error al guardar: ' + (err.message||putRes.status), '#dc2626');
+    }
+  } catch(e) {
+    showNotification('⚠️ Error de conexión: ' + e.message, '#dc2626');
+  }
+}
+
+function showNotification(msg, color) {
+  const existing = document.getElementById('notif');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'notif';
+  el.style.cssText = `position:fixed;bottom:20px;right:20px;background:${color};color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.4);max-width:360px`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  if (color !== '#2563eb') setTimeout(() => el.remove(), 5000);
+}
+
+loadData();
+setInterval(loadData, 60000);
+</script>
+
+<script>
+// Service Worker: fuerza recarga del dashboard sin caché
+if ('serviceWorker' in navigator) {
+  // Desregistrar cualquier SW anterior para evitar caché
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
+  });
+}
+
+// Forzar recarga si hay nueva versión disponible
+window.addEventListener('load', () => {
+  // Verificar versión cada 30 segundos
+  setInterval(async () => {
+    try {
+      const res = await fetch('data.json?v=' + Date.now(), {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+      });
+      if (res.ok) {
+        const fresh = await res.json();
+        if (globalData && fresh.last_updated !== globalData.last_updated) {
+          globalData = fresh;
+          render();
+          // Mostrar notificación de actualización
+          showUpdateNotification(fresh.last_updated);
+        }
+      }
+    } catch(e) {}
+  }, 30000);
+});
+
+function showUpdateNotification(time) {
+  const existing = document.getElementById('update-notif');
+  if (existing) existing.remove();
+  const notif = document.createElement('div');
+  notif.id = 'update-notif';
+  notif.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#16a34a;color:#fff;padding:12px 16px;border-radius:8px;font-size:13px;z-index:999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.3)';
+  notif.innerHTML = '✅ Dashboard actualizado — ' + time;
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 4000);
+}
+</script>
+
+</body>
+</html>
