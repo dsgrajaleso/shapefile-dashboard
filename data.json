@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-26 20:26:33",
+  "last_updated": "2026-05-26 20:26:44",
   "summary": {
     "total_files": 0,
     "successful": 0,
@@ -9,24 +9,5 @@
   },
   "municipalities": [],
   "shapefiles": [],
-  "history": [
-    {
-      "date": "2026-05-26 20:25:05",
-      "user": "Usuario",
-      "total": 1,
-      "successful": 1,
-      "municipalities": 1,
-      "elapsed": 1.23,
-      "folder": "PRUEBA_SHAPE_ORG"
-    },
-    {
-      "date": "2026-05-26 20:25:03",
-      "user": "Usuario",
-      "total": 1,
-      "successful": 1,
-      "municipalities": 1,
-      "elapsed": 1.23,
-      "folder": "PRUEBA_SHAPE_ORG"
-    }
-  ]
+  "history": []
 }
